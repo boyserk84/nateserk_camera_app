@@ -14,7 +14,7 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
-    private PreviewFragment previewFragment;
+    private PreviewFragment mPreviewFragment;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_camera:
                     TakePhoto();
                     return true;
-                case R.id.navigation_notifications:
+                case R.id.navigation_save:
                     return true;
             }
             return false;
@@ -37,14 +37,14 @@ public class MainActivity extends AppCompatActivity {
     private void TakePhoto()
     {
 
-        if (!previewFragment.IsAttached())
+        if (!this.mPreviewFragment.IsAttached())
         {
             Log.d("MainActivity", "Attach Preview Fragment!");
 
             // Begin the transaction
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             // Replace the contents of the container with the new fragment
-            ft.add(R.id.view_placeholder, previewFragment);
+            ft.add(R.id.view_placeholder, this.mPreviewFragment);
             // or ft.add(R.id.your_placeholder, new FooFragment());
             // Complete the changes added above
             ft.commit();
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private void PreviewPhoto(Bitmap bitmap)
     {
         Log.d("MainActivity", "Preview Photo is called!");
-        previewFragment.SetBitmap(bitmap, true);
+        this.mPreviewFragment.SetBitmap(bitmap, true);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        previewFragment = new PreviewFragment();
+        this.mPreviewFragment = new PreviewFragment();
     }
 
 }

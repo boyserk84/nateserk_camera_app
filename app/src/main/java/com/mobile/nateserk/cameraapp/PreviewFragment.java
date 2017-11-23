@@ -25,7 +25,7 @@ public class PreviewFragment extends Fragment {
 
     public Boolean IsAttached()
     {
-        return mIsAttach;
+        return this.mIsAttach;
     }
 
     @Override
@@ -46,24 +46,24 @@ public class PreviewFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         Log.d("PreviewFragment", "onViewCreated is called!");
         super.onViewCreated(view, savedInstanceState);
-        mImageView = (ImageView) view.findViewById(R.id.img_preview);
+        this.mImageView = (ImageView) view.findViewById(R.id.img_preview);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mIsAttach = true;
+        this.mIsAttach = true;
     }
 
     @Override
     public void onDetach() {
-        mIsAttach = false;
+        this.mIsAttach = false;
         super.onDetach();
     }
 
     public void SetBitmap(Bitmap bitmap, boolean showImmediately)
     {
-        mBitmap = bitmap;
+        this.mBitmap = bitmap;
         if (showImmediately)
         {
             PreviewBitmap();
@@ -72,11 +72,11 @@ public class PreviewFragment extends Fragment {
 
     public void PreviewBitmap()
     {
-        if (mImageView != null && mBitmap != null)
+        if (this.mImageView != null && this.mBitmap != null)
         {
-            mImageView.setImageBitmap(mBitmap);
+            this.mImageView.setImageBitmap(this.mBitmap);
         } else {
-            Log.d("PreviewFragment", "Unable to preview Bitmap! mImageView=" + (mImageView!=null));
+            Log.d("PreviewFragment", "Unable to preview Bitmap! mImageView=" + (this.mImageView!=null));
         }
     }
 }
