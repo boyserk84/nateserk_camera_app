@@ -28,6 +28,8 @@ public class PreviewFragment extends Fragment {
         return this.mIsAttach;
     }
 
+    public Bitmap GetBitmap() { return this.mBitmap; }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d("PreviewFragment", "onCreate is called!");
