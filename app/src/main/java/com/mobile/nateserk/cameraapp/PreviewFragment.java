@@ -57,8 +57,35 @@ public class PreviewFragment extends Fragment {
 
     @Override
     public void onDetach() {
+        Log.d("PreviewFragment", "onDetach is called!");
         this.mIsAttach = false;
         super.onDetach();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d("PreviewFragment", "onSaveInstanceState is called!");
+        super.onSaveInstanceState(outState);
+        if (mBitmap!=null)
+        {
+            outState.putParcelable("tmpImage", mBitmap);
+        }
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        Log.d("PreviewFragment","onViewStateRestored is called!");
+        super.onViewStateRestored(savedInstanceState);
+
+        if (savedInstanceState!=null)
+        {
+            mBitmap = (Bitmap) savedInstanceState.getParcelable("tmpImage");
+
+            if (mBitmap != null) {
+                SetBitmap(mBitmap, true);
+            }
+        }
+
     }
 
     public void SetBitmap(Bitmap bitmap, boolean showImmediately)
