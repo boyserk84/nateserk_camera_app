@@ -1,5 +1,7 @@
 package com.mobile.nateserk.cameraapp;
 
+import android.net.Uri;
+import android.os.Environment;
 import android.os.PersistableBundle;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
@@ -12,9 +14,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
 public class MainActivity extends AppCompatActivity {
 
+    private final String TEMP_PHOTO_URI = "/testPhoto.png";
+
+    private final String SAVE_FILENAME_URI = "/finalTestPhoto.png";
+
     private PreviewFragment mPreviewFragment;
+
+    private Uri mHqImageUri;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -28,11 +40,58 @@ public class MainActivity extends AppCompatActivity {
                     TakePhoto();
                     return true;
                 case R.id.navigation_save:
+                    SavePhotoFromUri();
                     return true;
             }
             return false;
         }
     };
+
+    private void SavePhotoFromBitmap()
+    {
+        Bitmap bitmap = mPreviewFragment.GetBitmap();
+
+        if (bitmap != null)
+        {
+            Log.d("MainActivity", "Bitmap Exists! Need to test actual image.");
+            // TODO: Write to file and check if bitmap contains the image.
+
+            String path = GetStoragePathForCapturedPhoto();
+            File newFile = new File(path, SAVE_FILENAME_URI);
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(newFile);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            try {
+                fos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            // TODO: Show Error message
+            Log.d("MainActivity","NO BITMAP! ABORT!!!!");
+        }
+    }
+
+    private void SavePhotoFromUri()
+    {
+        File tempPhoto = new File(GetStoragePathForCapturedPhoto(), TEMP_PHOTO_URI);
+        if (tempPhoto != null && tempPhoto.exists())
+        {
+            // TODO: Do we need to retain a preview?
+            tempPhoto.renameTo(new File(GetStoragePathForCapturedPhoto(), SAVE_FILENAME_URI));
+        }
+    }
+
+    private String GetStoragePathForCapturedPhoto()
+    {
+        // TODO: This could be internal storage instead of external.
+        return Environment.getExternalStorageDirectory().toString();
+    }
 
     private void TakePhoto()
     {
@@ -50,9 +109,16 @@ public class MainActivity extends AppCompatActivity {
             ft.commit();
         }
 
-        Log.d("MainActivity", "Take A photo Intent!");
+
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File capturePhoto = new File(GetStoragePathForCapturedPhoto(), TEMP_PHOTO_URI);
+        mHqImageUri = Uri.fromFile(capturePhoto);
+        // Ensure high quality
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mHqImageUri);
+
+        Log.d("MainActivity", "Take A photo Intent and temporarily save to " + capturePhoto.getPath());
+
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, 1);
         }
@@ -61,9 +127,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            PreviewPhoto(imageBitmap);
+            // This is for thumbnail
+            //Bundle extras = data.getExtras();
+            //Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+            PreviewPhotoFromUri(this.mHqImageUri);
         }
     }
 
@@ -73,9 +141,13 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
-    private void PreviewPhoto(Bitmap bitmap)
+    private void PreviewPhotoFromUri(Uri imageUri)
     {
-        Log.d("MainActivity", "Preview Photo is called!");
+        this.mPreviewFragment.SetImageUri(mHqImageUri);
+    }
+
+    private void PreviewPhotoFromBitmap(Bitmap bitmap)
+    {
         this.mPreviewFragment.SetBitmap(bitmap, true);
     }
 
